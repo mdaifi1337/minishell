@@ -36,7 +36,6 @@ char	*get_token(char *str, int *i, t_type *type)
 	*type = special_characters(str, *i);
 	if (*type)
 	{
-		printf("---------------------------type\n");
 		count = 1;
 		if (*type == e_dless || *type == e_dgreat)
 			count = 2;
@@ -73,36 +72,27 @@ void	tokenize_command_line(char *str)
 	int		i;
 
 	i = 0;
-	token_list = ft_lstnew("start");
-	printf("%s\n", str);
+	token_list = ft_lstnew(create_new_token(NULL, e_start));
 	while (str[i])
 	{
-		if (str[i] == ' '){
+		if (str[i] == ' ')
 			i++;
-			continue;
-		}
 		else
 		{
 			token = get_token(str, &i, &type);
 			token_node = create_new_token(token, type);
-			printf("token : |%s|\n", token_node->token);
 			tmp = ft_lstnew(token_node);
 			ft_lstadd_back(&token_list, tmp);
 		}
-		if (str[i + 1] == '\0') {
-			break;
-		}
-		i++;
-		printf("%d\n", i);
-		printf("%c\n", str[i]);
 	}
-	/* it_list = token_list;
+	it_list = token_list;
+		free(token_node);
 	while (it_list)
 	{
 		token_node = (t_token *)it_list->content;
-		printf("OK\n");
+			printf("token : |%s|\n", token_node->token);
 		it_list = it_list->next;
-	} */
+	}
 }
 
 int	main(int argc, char *argv[])
