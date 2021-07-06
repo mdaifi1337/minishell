@@ -1,7 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include "libft/libft.h"
+#ifndef MINISHELL_
+# include <stdio.h>
+# include <stdlib.h>
+# include <fcntl.h>
+# include "libft/libft.h"
+#include <readline/readline.h>
+#include <readline/history.h>
 
 typedef enum	e_type
 {
@@ -14,4 +17,6 @@ typedef	struct s_token
 	t_type			type;
 }t_token;
 
+void	check_token_syntax(t_list *token);
 
+#endif
