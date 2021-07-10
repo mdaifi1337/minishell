@@ -12,14 +12,14 @@ t_token	*create_new_token(char *str, t_type type)
 
 t_type	special_characters(char *str, int i)
 {
-	if (!ft_strncmp(str + i, "< ", 2))
-		return (e_less);
 	if (!ft_strncmp(str + i, "<<", 2))
 		return (e_dless);
-	if (!ft_strncmp(str + i, "> ", 2))
-		return (e_great);
 	if (!ft_strncmp(str + i, ">>", 2))
 		return (e_dgreat);
+	if (!ft_strncmp(str + i, "<", 1))
+		return (e_less);
+	if (!ft_strncmp(str + i, ">", 1))
+		return (e_great);
 	if (!ft_strncmp(str + i, "|", 1))
 		return (e_pipe);
 	return (e_word);
@@ -46,14 +46,8 @@ char	*get_token(char *str, int *i, t_type *type)
 	{
 		while (str[j] && ((!ft_strchr(" |<>", str[j]) && !quote) || quote))
 		{
-			if (str[j] == '\"' || str[j] == '\'')
-				quote = 1;
-			if (str[j + 1] == '\"' || str[j + 1] == '\'')
-			{
-				j++;
-				count++;
-				quote = 0;
-			}
+			if ((str[j] == '\"' || str[j] == '\''))
+				quote = 1 - quote;
 			j++;
 			count++;
 		}
@@ -89,6 +83,8 @@ t_list	*tokenize_command_line(char *str)
 		{
 			token = get_token(str, &i, &type);
 			token_node = create_new_token(token, type);
+			// printf("token : |%s|\n", token);
+			// printf("type : |%d|\n", (int)type);
 			tmp = ft_lstnew(token_node);
 			ft_lstadd_back(&token_list, tmp);
 		}
@@ -98,13 +94,17 @@ t_list	*tokenize_command_line(char *str)
 	return (token_list);
 }
 
-int	main(int argc, char *argv[])
+int	main(int argc, char *argv[], char *env[])
 {
+	t_command_line	*cmd_line;
 	t_token	*token;
+	t_list	*tmp;
+	t_list	*cmds_list;
 	t_list	*token_list;
 	char	*prompt;
 	char	*str;
 	int		true;
+	int		i;
 
 	true = 1;
 	while (true)
@@ -118,11 +118,25 @@ int	main(int argc, char *argv[])
 			else
 			{
 				token_list = tokenize_command_line(str);
-				token = (t_token *)token_list->next->content;
-				printf("size of token list : %d\n", ft_lstsize(token_list));
-				printf("token main : %s\n", token->token);
-				printf("type main : %d\n", (int)token->type);
-				check_token_syntax(token_list);
+				if (!check_token_syntax(token_list))
+					ft_free_list(token_list);
+				tmp = token_list;
+				while(tmp)
+				{
+					token = (t_token *)tmp->content;
+					printf("token : %s\n", token->token);
+					printf("OK\n");
+					tmp = tmp->next;
+				}
+				treat_quotes(&cmds_list, token_list);
+				tmp = cmds_list->next;
+				while (tmp)
+				{
+					cmd_line = (t_command_line *)tmp->content;
+					i = -1;
+					while (cmd_line->args[++i])
+						printf("----%s\n", cmd_line->args[i]);
+				}
 				free(str);
 			}
 		} 
