@@ -97,7 +97,7 @@ t_list	*tokenize_command_line(char *str)
 int	main(int argc, char *argv[], char *env[])
 {
 	t_command_line	*cmd_line;
-	t_token	*token;
+	t_token	*token_node;
 	t_list	*tmp;
 	t_list	*cmds_list;
 	t_list	*token_list;
@@ -110,7 +110,7 @@ int	main(int argc, char *argv[], char *env[])
 	while (true)
 	{
 		printf("\033[1;36mminishell > \033[0m");
-		str = readline(prompt);
+		str = readline(NULL);
 		if (ft_strlen(str))
 		{
 			if (!ft_strncmp(str, "exit", 5))
@@ -120,22 +120,27 @@ int	main(int argc, char *argv[], char *env[])
 				token_list = tokenize_command_line(str);
 				if (!check_token_syntax(token_list))
 					ft_free_list(token_list);
-				tmp = token_list;
-				while(tmp)
+				else
 				{
-					token = (t_token *)tmp->content;
-					printf("token : %s\n", token->token);
-					printf("OK\n");
-					tmp = tmp->next;
-				}
-				treat_quotes(&cmds_list, token_list);
-				tmp = cmds_list->next;
-				while (tmp)
-				{
-					cmd_line = (t_command_line *)tmp->content;
-					i = -1;
-					while (cmd_line->args[++i])
-						printf("----%s\n", cmd_line->args[i]);
+					// tmp = token_list->next;
+					// while(tmp)
+					// {
+					// 	token_node = (t_token *)tmp->content;
+					// 	tmp = tmp->next;
+					// }
+					cmds_list = treat_quotes(token_list);
+					tmp = cmds_list;
+					while (tmp)
+					{
+						cmd_line = (t_command_line *)tmp->content;
+						i = -1;
+						while (cmd_line->args[++i])
+						{
+							printf("%s\n", cmd_line->args[i]);
+							// sleep(1);
+						}
+						tmp = tmp->next;
+					}
 				}
 				free(str);
 			}

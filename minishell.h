@@ -23,7 +23,7 @@ typedef	struct	s_token
 }t_token;
 
 void	ft_free_list(t_list *head);
-void	treat_quotes(t_list **cmds_list, t_list *token_list);
+t_list	*treat_quotes(t_list *token_list);
 int		check_token_syntax(t_list *token);
 
 #endif

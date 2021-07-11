@@ -7,7 +7,6 @@ static int	calc_nbr_of_words_in_quotes(char *str, int *size)
 
 	i = -1;
 	quote = 0;
-	printf("hi %s\n", str);
 	while (str[++i])
 	{
 		if (str[i] == '\"' || str[i] == '\'')
@@ -15,6 +14,10 @@ static int	calc_nbr_of_words_in_quotes(char *str, int *size)
 		if (str[i] == ' ')
 			(*size)++;
 	}
+	if (*size == 1)
+		(*size)++;
+	else
+		(*size)++;
 	if (quote)
 		write(2, "Error, unclosed quotes!\n", 25);
 	else
@@ -29,55 +32,68 @@ char	*allocate_word(char *str, int *i)
 	int		j;
 	int		k;
 
-	j = *i;
 	size = 0;
 	if (str[*i] == ' ')
 		(*i)++;
-	while (str[++(*i)] && str[(*i)] != ' ')
+	j = *i;
+	while (str[*i] && str[*i] != ' ')
 	{
 		if (str[(*i)] == '\'' || str[(*i)] == '\"')
 			(*i)++;
 		size++;
+		(*i)++;
 	}
 	res = (char *)malloc(sizeof(char) * size + 1);
+	k = 0;
 	while (k < size)
+	{
+		if (str[(j)] == '\'' || str[(j)] == '\"')
+			j++;
 		res[k++] = str[j++];
+	}
 	res[k] = '\0';
 	return (res);
 }
 
-void	treat_quotes(t_list **cmds_list, t_list *token_list)
+t_list	*treat_quotes(t_list *token_list)
 {
 	t_list			*it_list;
 	t_token			*token;
+	// t_list			*tmp;
 	t_command_line	*cmd_line;
+	t_command_line	*tmp;
+	char			**args;
+	t_list 			*cmds_list;
 	int				size;
 	int				i;
 	int				j;
 
-	size = 1;
 	it_list = token_list->next;
-	while (it_list)
+	cmds_list = NULL;
+	while (it_list->next)
 	{
+		cmd_line = (t_command_line *)malloc(sizeof(t_command_line));
+		size = 1;
 		token = (t_token *)it_list->content;
-		printf("OK 2\n");
 		printf("token->token : %s\n", token->token);
-		if (!calc_nbr_of_words_in_quotes(token->token, &size))
-			return ;
-		else
+		calc_nbr_of_words_in_quotes(token->token, &size);
+		i = 0;
+		j = 0;
+		printf("size : %d\n", size);
+		cmd_line->args = (char **)malloc(sizeof(char *) * size);
+		while (j < size - 1)
 		{
-			printf("OK\n");
-			i = 0;
-			j = 0;
-			cmd_line->args = (char **)malloc(sizeof(char *) * size + 1);
-			while (j < size)
-			{
-				cmd_line->args[j] = allocate_word(token->token, &i);
-				j++;
-			}
-			cmd_line->args[j] = NULL;
-			ft_lstadd_back(cmds_list, ft_lstnew(cmd_line));
+			cmd_line->args[j] = allocate_word(token->token, &i);
+			// printf("cmd_line->args[%d] : %s\n", j, cmd_line->args[j]);
+			j++;
 		}
+		cmd_line->args[j] = NULL;
+
+		
+		ft_lstadd_back(&cmds_list, ft_lstnew(cmd_line));
 		it_list = it_list->next;
+		// free(tmp);
+		//  free(cmd_line);
 	}
+	return (cmds_list);
 }

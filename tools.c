@@ -9,6 +9,7 @@ void	ft_free_list(t_list *head)
 	{
 		tmp = head;
 		head = head->next;
+		free(tmp->content);
 		free(tmp);
 	}
 }
