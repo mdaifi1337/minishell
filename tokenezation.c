@@ -136,9 +136,10 @@ int	main(int argc, char *argv[], char *env[])
 						i = -1;
 						while (cmd_line->args[++i])
 						{
-							printf("%s\n", cmd_line->args[i]);
+							printf("---- %s\n", cmd_line->args[i]);
 							// sleep(1);
 						}
+						printf("~~~~~~~~~~~~~~~~~~~~~~\n");
 						tmp = tmp->next;
 					}
 				}
