@@ -1,6 +1,6 @@
 NAME= minishell
 FLAGS= -Werror -Wall -Wextra
-SRCS= tokenezation.c check_token_syntax.c tools.c treat_quotes.c
+SRCS= tokenezation.c check_token_syntax.c tools.c treat_pipe_sequence.c linked_list_tools.c vector.c
 OBJS= $(SRCS:.c=.o)
 LIBFT= libft/libft.a
 

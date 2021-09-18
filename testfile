@@ -1,0 +1,1 @@
+echo "hi"hello world"42" "this is" "a test" | cat -e > file >> file2 << file3 > file4 | echo "redirection" > infile << outfile >> outfile2
