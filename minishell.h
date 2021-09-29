@@ -6,15 +6,21 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 
-typedef enum	e_type
+typedef enum e_type
 {
 	e_word, e_pipe, e_less, e_great, e_dless, e_dgreat, e_start, e_end
 }t_type;
 
+typedef struct s_char_vec {
+	char	*arg;
+	int		size;
+	int		used_size;
+}t_char_vec;
+
 typedef struct s_vector {
-    char	**args;
-    int		size;
-    int		total_size;
+	char		**args;
+	int			size;
+	int			used_size;
 }t_vector;
 
 typedef struct s_redirect
@@ -27,7 +33,7 @@ typedef struct s_redirect
 
 typedef struct	s_cmd_line
 {
-	char				**args;
+	t_vector			args;
 	int					i;
 	t_redirect			*redirect;
 	struct s_cmd_line	*next;
@@ -41,14 +47,18 @@ typedef	struct	s_token
 }t_token;
 
 int		check_token_syntax(t_token *token);
-char	**copy_table(char **tab, int size);
+char	**copy_vector(char **tab, int size);
 void	ft_free_list(t_token *head);
 void	ft_free_redirect_list(t_redirect *head);
+void	free_cmd_line_list(t_cmd_line *cmd_line);
+void	init_char_vec(t_char_vec *char_vec);
+void	char_vec_add(t_char_vec *char_vec, char c);
 void	free_vector(t_vector *v);
 void	vector_init(t_vector *v);
 void	vector_add(t_vector *v, char *item);
-void	vector_add(t_vector *v, char *item);
-void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector *v, t_redirect *redirect);
+void	vector_resize(t_vector *v, int size);
+void	vector_add_at_index(t_vector *v, int index, char *item);
+void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redirect *redirect);
 void	lst_add_back_redirect(t_redirect **redirect, t_type type, char *file);
 t_cmd_line	*treat_pipe_sequence(t_token *token_list);
 
