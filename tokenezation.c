@@ -108,18 +108,57 @@ void	insert_dollar_vars_in_vector(t_vector *v, int size, int curr_pos)
 	int	i;
 	int	j;
 
+	printf("---------------------------------- size : %d\n", size);
 	if (v->used_size + size > v->size)
 		vector_resize(v, v->size + size);
-	i = (v->used_size + size) - 1;
-	j = v->used_size - 1;
-	while (j > curr_pos && v->args[j])
+	if (size > 1)
 	{
-		v->args[i] = ft_strdup(v->args[j]);
-		free(v->args[j]);
-		v->args[j] = NULL;
-		j--;
-		i--;
+		i = (v->used_size + size) - 1;
+		j = v->used_size - 1;
+		while (j > curr_pos && v->args[j])
+		{
+			v->args[i] = ft_strdup(v->args[j]);
+			free(v->args[j]);
+			v->args[j] = NULL;
+			j--;
+			i--;
+		}
 	}
+}
+
+void	ignore_dollar_var(t_vector *v, int i)
+{
+	int			j;
+	t_char_vec	res;
+
+	init_char_vec(&res);
+	j = -1;
+	while (v->args[i][++j] != '$' && v->args[i][j])
+		char_vec_add(&res, v->args[i][j]);
+	j++;
+	while (v->args[i][j] && ft_isalnum(v->args[i][j]))
+		j++;
+	char_vec_add(&res, ' ');
+	while (v->args[i][j])
+	{
+		char_vec_add(&res, v->args[i][j]);
+		j++;
+	}
+	free(v->args[i]);
+	v->args[i] = ft_strdup(res.arg);
+}
+
+void	resize_vec_dollar_var_empty(t_vector *v, int i)
+{
+	while (i < v->used_size - 1)
+	{
+		free(v->args[i]);
+		v->args[i] = ft_strdup(v->args[i + 1]);
+		i++;
+	}
+	free(v->args[v->used_size - 1]);
+	v->args[v->used_size - 1] = NULL;
+	v->used_size--;
 }
 
 void	split_dollar_var(t_vector *v, int i, int curr_pos, char *value)
@@ -133,47 +172,75 @@ void	split_dollar_var(t_vector *v, int i, int curr_pos, char *value)
 	tmp = ft_strdup(v->args[i]);
 	init_char_vec(&new_char_vec);
 	tab = ft_split(value, ' ');
-	j = -1;
-	while (tmp[++j] != '$')
-		char_vec_add(&new_char_vec, tmp[j]);
-	if (tmp[curr_pos] != ' ')
-	{
-		j = -1;
-		while (tab[0][++j])
-			char_vec_add(&new_char_vec, tab[0][j]);
-	}
 	size = 0;
 	while (tab[size])
 		size++;
-	insert_dollar_vars_in_vector(v, size - 1, i);
-	j = 0;
-	while (tab[++j])
+	if (tab[0])
 	{
-		vector_add_at_index(v, i, new_char_vec.arg);
-		free(new_char_vec.arg);
-		init_char_vec(&new_char_vec);
-		size = -1;
-		while (tab[j][++size])
-			char_vec_add(&new_char_vec, tab[j][size]);
-		i++;
-	}
-	if (tmp[curr_pos] != '\0')
-	{
-		free(new_char_vec.arg);
-		init_char_vec(&new_char_vec);
-		size = -1;
-		while (tab[j - 1][++size])
-			char_vec_add(&new_char_vec, tab[j - 1][size]);
-		while (tmp[curr_pos])
+		j = -1;
+		while (tmp[++j] != '$')
+			char_vec_add(&new_char_vec, tmp[j]);
+		if (tmp[curr_pos] != ' ')
 		{
-			char_vec_add(&new_char_vec, tmp[curr_pos]);
-			curr_pos++;
+			j = -1;
+			while (tab[0][++j])
+				char_vec_add(&new_char_vec, tab[0][j]);
 		}
-		vector_add_at_index(v, i, new_char_vec.arg);
+		j = 0;
+		if (size > 1)
+		{
+			insert_dollar_vars_in_vector(v, size - 1, i);
+			while (tab[++j])
+			{
+				vector_add_at_index(v, i, new_char_vec.arg);
+				free(new_char_vec.arg);
+				init_char_vec(&new_char_vec);
+				size = -1;
+				while (tab[j][++size])
+					char_vec_add(&new_char_vec, tab[j][size]);
+				i++;
+			}
+			if (tmp[curr_pos] != '\0')
+			{
+				free(new_char_vec.arg);
+				init_char_vec(&new_char_vec);
+				size = -1;
+				while (tab[j - 1][++size])
+					char_vec_add(&new_char_vec, tab[j - 1][size]);
+				while (tmp[curr_pos])
+				{
+					char_vec_add(&new_char_vec, tmp[curr_pos]);
+					curr_pos++;
+				}
+				vector_add_at_index(v, i, new_char_vec.arg);
+			}
+			else
+				v->args[i] = ft_strdup(tab[j - 1]);
+		}
+		else
+		{
+			if (tmp[curr_pos] != '\0')
+			{
+				while (tmp[curr_pos])
+				{
+					char_vec_add(&new_char_vec, tmp[curr_pos]);
+					curr_pos++;
+				}
+			}
+			free(v->args[i]);
+			v->args[i] = ft_strdup(new_char_vec.arg);
+		}
 	}
 	else
-		v->args[i] = ft_strdup(tab[j - 1]);
+	{
+		if (v->args[i + 1] == NULL || v->used_size == i)
+			ignore_dollar_var(v, i);
+		else
+			resize_vec_dollar_var_empty(v, i);
+	}
 	free(tmp);
+	free(new_char_vec.arg);
+	free_array(tab);
 }
 
 void	remove_quotes(t_vector *v)
@@ -225,15 +292,39 @@ void	replace_dollar_var_by_value(t_vector *v, int curr_pos, char *name, char *va
 	while (name[++j])
 		i++;
 	while (tmp[++i])
-	{
 		char_vec_add(&new_char_vec, tmp[i]);
-	}
 	free(v->args[curr_pos]);
 	v->args[curr_pos] = ft_strdup(new_char_vec.arg);
 	free(tmp);
 }
 
-void	expand_dollar_var(t_vector *v, int i)
+void	dollar_var_not_found(t_vector *v, int i)
+{
+	int			j;
+	t_char_vec	new_char_vec;
+
+	init_char_vec(&new_char_vec);
+	j = 0;
+	while (v->args[i][j] && v->args[i][j] != '$')
+	{
+		char_vec_add(&new_char_vec, v->args[i][j]);
+		j++;
+	}
+	j++;
+	while (ft_isalnum(v->args[i][j]) && v->args[i][j])
+		j++;
+	if (!ft_isalnum(v->args[i][j]) || v->args[i][j] != '_')
+		j++;
+	while (v->args[i][j])
+	{
+		char_vec_add(&new_char_vec, v->args[i][j]);
+		j++;
+	}
+	free(v->args[i]);
+	v->args[i] = ft_strdup(new_char_vec.arg);
+}
+
+void	expand_dollar_var(t_vector *v, int i, int *found_dollar)
 {
 	int			dquote;
 	int			squote;
@@ -254,30 +345,40 @@ void	expand_dollar_var(t_vector *v, int i)
 			squote = 1 - squote;
 		if (v->args[i][j] == '$' && !squote)
 		{
+			*found_dollar = 1;
 			init_char_vec(&name);
 			while (v->args[i][++j] && (ft_isalnum(v->args[i][j]) || v->args[i][j] == '_') && v->args[i][j] != '?')
 				char_vec_add(&name, v->args[i][j]);
 			value = getenv(name.arg);
 			if (!dquote && value)
 				split_dollar_var(v, i, j,value);
-			else
+			else if (dquote && value)
 				replace_dollar_var_by_value(v, i, name.arg, value);
+			else if (!value)
+				dollar_var_not_found(v, i);
+			free(name.arg);
 		}
 	}
 }
 
 void	look_for_expandable_vars(t_cmd_line *cmd_line)
 {
+	int			found_dollar;
 	int			i;
 	t_cmd_line	*tmp;
 
 	tmp = cmd_line;
-	// If you have $ inside a dollar variable, ignore the whole world
 	while (tmp)
 	{
-		i = -1;
-		while (++i < tmp->args.used_size)
-			expand_dollar_var(&tmp->args, i);
+		i = 0;
+		while (i < tmp->args.used_size)
+		{
+			found_dollar = 0;
+			printf("------------------------------------------ arg[%d] : %s\n", i, tmp->args.args[i]);
+			expand_dollar_var(&tmp->args, i, &found_dollar);
+			if (!found_dollar)
+				i++;
+		}
 		remove_quotes(&tmp->args);
 		tmp = tmp->next;
 	}
