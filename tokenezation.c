@@ -15,26 +15,6 @@ t_type	redirections(char *str, int i)
 	return (e_word);
 }
 
-void	lst_add_back_token(t_token **token_list, t_type type, char *str)
-{
-	t_token	*new;
-	t_token	*tmp;
-
-	new = (t_token *)malloc(sizeof(t_token));
-	new->token = ft_strdup(str);
-	new->type = type;
-	new->next = NULL;
-	tmp = *token_list;
-	if (*token_list == NULL)
-		*token_list = new;
-	else
-	{
-		while (tmp->next)
-			tmp = tmp->next;
-		tmp->next = new;
-	}
-}
-
 char	*get_token(char *str, int *i, t_type *type)
 {
 	int		double_quote;
@@ -82,7 +62,6 @@ t_token	*tokenize_command_line(char *str)
 {
 	t_type	type;
 	t_token	*token_list;
-	t_token	*tmp;
 	char	*token;
 	int		i;
 
@@ -96,69 +75,16 @@ t_token	*tokenize_command_line(char *str)
 		else
 		{
 			token = get_token(str, &i, &type);
+			if (!check_nbr_of_quotes(token))
+			{
+				free_token_list(token_list);
+				return (NULL);
+			}
 			lst_add_back_token(&token_list, type, token);
 		}
 	}
 	lst_add_back_token(&token_list, e_end, "newline");
 	return (token_list);
-}
-
-void	insert_dollar_vars_in_vector(t_vector *v, int size, int curr_pos)
-{
-	int	i;
-	int	j;
-
-	printf("---------------------------------- size : %d\n", size);
-	if (v->used_size + size > v->size)
-		vector_resize(v, v->size + size);
-	if (size > 1)
-	{
-		i = (v->used_size + size) - 1;
-		j = v->used_size - 1;
-		while (j > curr_pos && v->args[j])
-		{
-			v->args[i] = ft_strdup(v->args[j]);
-			free(v->args[j]);
-			v->args[j] = NULL;
-			j--;
-			i--;
-		}
-	}
-}
-
-void	ignore_dollar_var(t_vector *v, int i)
-{
-	int			j;
-	t_char_vec	res;
-
-	init_char_vec(&res);
-	j = -1;
-	while (v->args[i][++j] != '$' && v->args[i][j])
-		char_vec_add(&res, v->args[i][j]);
-	j++;
-	while (v->args[i][j] && ft_isalnum(v->args[i][j]))
-		j++;
-	char_vec_add(&res, ' ');
-	while (v->args[i][j])
-	{
-		char_vec_add(&res, v->args[i][j]);
-		j++;
-	}
-	free(v->args[i]);
-	v->args[i] = ft_strdup(res.arg);
-}
-
-void	resize_vec_dollar_var_empty(t_vector *v, int i)
-{
-	while (i < v->used_size - 1)
-	{
-		free(v->args[i]);
-		v->args[i] = ft_strdup(v->args[i + 1]);
-		i++;
-	}
-	free(v->args[v->used_size - 1]);
-	v->args[v->used_size - 1] = NULL;
-	v->used_size--;
 }
 
 void	split_dollar_var(t_vector *v, int i, int curr_pos, char *value)
@@ -169,6 +95,7 @@ void	split_dollar_var(t_vector *v, int i, int curr_pos, char *value)
 	int		j;
 	t_char_vec	new_char_vec;
 
+	printf("split\n");
 	tmp = ft_strdup(v->args[i]);
 	init_char_vec(&new_char_vec);
 	tab = ft_split(value, ' ');
@@ -233,98 +160,18 @@ void	split_dollar_var(t_vector *v, int i, int curr_pos, char *value)
 	}
 	else
 	{
-		if (v->args[i + 1] == NULL || v->used_size == i)
+		if (v->args[i + 1] == NULL || v->used_size == i + 1)
 			ignore_dollar_var(v, i);
 		else
-			resize_vec_dollar_var_empty(v, i);
+		
+			resize_vec_when_dollar_var_empty(v, i);
 	}
 	free(tmp);
 	free(new_char_vec.arg);
 	free_array(tab);
 }
 
-void	remove_quotes(t_vector *v)
-{
-	int	i;
-	int	j;
-	int	squote;
-	t_char_vec	new_char_vec;
-
-	i = -1;
-	squote = 0;
-	while (++i < v->used_size)
-	{
-		init_char_vec(&new_char_vec);
-		j = -1;
-		while (v->args[i][++j])
-		{
-			if (v->args[i][j] == '\'')
-			{
-				squote = 1 - squote;
-				j++;
-			}
-			if (v->args[i][j] == '\"' && !squote)
-				j++;
-			char_vec_add(&new_char_vec, v->args[i][j]);
-		}
-		free(v->args[i]);
-		v->args[i] = ft_strdup(new_char_vec.arg);
-		free(new_char_vec.arg);
-	}
-}
-
-void	replace_dollar_var_by_value(t_vector *v, int curr_pos, char *name, char *value)
-{
-	int			i;
-	int			j;
-	char		*tmp;
-	t_char_vec	new_char_vec;
-
-	tmp = ft_strdup(v->args[curr_pos]);
-	init_char_vec(&new_char_vec);
-	i = -1;
-	while (tmp[++i] != '$')
-		char_vec_add(&new_char_vec, tmp[i]);
-	j = -1;
-	while (value[++j])
-		char_vec_add(&new_char_vec, value[j]);
-	j = -1;
-	while (name[++j])
-		i++;
-	while (tmp[++i])
-		char_vec_add(&new_char_vec, tmp[i]);
-	free(v->args[curr_pos]);
-	v->args[curr_pos] = ft_strdup(new_char_vec.arg);
-	free(tmp);
-}
-
-void	dollar_var_not_found(t_vector *v, int i)
-{
-	int			j;
-	t_char_vec	new_char_vec;
-
-	init_char_vec(&new_char_vec);
-	j = 0;
-	while (v->args[i][j] && v->args[i][j] != '$')
-	{
-		char_vec_add(&new_char_vec, v->args[i][j]);
-		j++;
-	}
-	j++;
-	while (ft_isalnum(v->args[i][j]) && v->args[i][j])
-		j++;
-	if (!ft_isalnum(v->args[i][j]) || v->args[i][j] != '_')
-		j++;
-	while (v->args[i][j])
-	{
-		char_vec_add(&new_char_vec, v->args[i][j]);
-		j++;
-	}
-	free(v->args[i]);
-	v->args[i] = ft_strdup(new_char_vec.arg);
-}
-
-void	expand_dollar_var(t_vector *v, int i, int *found_dollar)
+void	expand_dollar_var(t_vector *v, int i)
 {
 	int			dquote;
 	int			squote;
@@ -343,17 +190,16 @@ void	expand_dollar_var(t_vector *v, int i, int *found_dollar)
 			dquote = 1 - dquote;
 		if (v->args[i][j] == '\'')
 			squote = 1 - squote;
-		if (v->args[i][j] == '$' && !squote)
+		if (v->args[i][j] == '$')
 		{
-			*found_dollar = 1;
 			init_char_vec(&name);
 			while (v->args[i][++j] && (ft_isalnum(v->args[i][j]) || v->args[i][j] == '_') && v->args[i][j] != '?')
 				char_vec_add(&name, v->args[i][j]);
 			value = getenv(name.arg);
-			if (!dquote && value)
+			if (!squote && !dquote && value)
 				split_dollar_var(v, i, j,value);
-			else if (dquote && value)
-				replace_dollar_var_by_value(v, i, name.arg, value);
+			else if (!squote && dquote && value)
+				replace_dollar_var(v, i, name.arg, value);
 			else if (!value)
 				dollar_var_not_found(v, i);
 			free(name.arg);
@@ -363,22 +209,15 @@ void	expand_dollar_var(t_vector *v, int i, int *found_dollar)
 
 void	look_for_expandable_vars(t_cmd_line *cmd_line)
 {
-	int			found_dollar;
 	int			i;
 	t_cmd_line	*tmp;
 
 	tmp = cmd_line;
 	while (tmp)
 	{
-		i = 0;
-		while (i < tmp->args.used_size)
-		{
-			found_dollar = 0;
-			printf("------------------------------------------ arg[%d] : %s\n", i, tmp->args.args[i]);
-			expand_dollar_var(&tmp->args, i, &found_dollar);
-			if (!found_dollar)
-				i++;
-		}
+		i = -1;
+		while (++i < tmp->args.used_size)
+			expand_dollar_var(&tmp->args, i);
 		remove_quotes(&tmp->args);
 		tmp = tmp->next;
 	}
@@ -388,27 +227,29 @@ int	main(int argc, char *argv[], char *env[])
 {
 	t_cmd_line	*cmd_line;
 	t_cmd_line	*tmp;
-	t_redirect	*tmp_redir;
+	t_redir		*tmp_redir;
 	t_token		*token_list;
+	t_token		*token_tmp;
 	char		*str;
-	int			true;
+	int			ok;
 	int			i;
 
-	true = 1;
+	ok = 1;
 	cmd_line = NULL;
-	while (true)
+	while (ok)
 	{
 		str = readline("minishell > ");
 		if (ft_strlen(str))
 		{
+			add_history(str);
 			if (!ft_strncmp(str, "exit", 5))
-				true = 0;
+				ok = 0;
 			else
 			{
 				token_list = tokenize_command_line(str);
-				if (!check_token_syntax(token_list))
-					ft_free_list(token_list);
-				else
+				if (token_list && !check_token_syntax(token_list))
+					free_token_list(token_list);
+				else if (token_list)
 				{
 					cmd_line = treat_pipe_sequence(token_list);
 					look_for_expandable_vars(cmd_line);
@@ -418,7 +259,7 @@ int	main(int argc, char *argv[], char *env[])
 						i = -1;
 						while (++i < tmp->args.used_size)
 							printf("---- |%s|\n", tmp->args.args[i]);
-						tmp_redir = tmp->redirect;
+						tmp_redir = tmp->redir;
 						while (tmp_redir)
 						{
 							printf("+++ %s\n", tmp_redir->file);
@@ -428,11 +269,9 @@ int	main(int argc, char *argv[], char *env[])
 						printf("~~~~~~~~~~~~~~~~~~~~~~\n");
 						tmp = tmp->next;
 					}
-					
+					free(str);
+					free_cmd_line_list(cmd_line);
 				}
-				free(str);
-				free_cmd_line_list(cmd_line);
-				cmd_line = NULL;
 			}
 		}
 	}

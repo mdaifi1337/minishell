@@ -1,10 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   vector.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/10/26 16:18:01 by mdaifi            #+#    #+#             */
+/*   Updated: 2021/10/30 13:56:17 by mdaifi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-void vector_init(t_vector *v)
+void	vector_init(t_vector *v)
 {
-    v->size = 1;
-    v->used_size = 0;
-    v->args = (char **)malloc(sizeof(char *) * v->size);
+	v->size = 1;
+	v->used_size = 0;
+	v->args = (char **)malloc(sizeof(char *) * v->size);
+	v->args[0] = NULL;
 }
 
 static char	**ft_realloc(t_vector *v, int size)
@@ -22,7 +35,7 @@ static char	**ft_realloc(t_vector *v, int size)
 	i = -1;
 	while (++i < v->used_size)
 		new[i] = v->args[i];
-	while (i < size)
+	while (i < size - 1)
 	{
 		new[i] = NULL;
 		i++;
@@ -32,21 +45,21 @@ static char	**ft_realloc(t_vector *v, int size)
 
 void	vector_resize(t_vector *v, int size)
 {
-    char	**items;
+	char	**items;
 
 	items = ft_realloc(v, size);
-    if (items)
+	if (items)
 	{
-        v->args = items;
-        v->size = size;
-    }
+		v->args = items;
+		v->size = size;
+	}
 }
 
 void	vector_add(t_vector *v, char *item)
 {
 	if (v->size == v->used_size)
-    	vector_resize(v, v->size * 2);
-    v->args[v->used_size++] = ft_strdup(item);
+		vector_resize(v, v->size * 2);
+	v->args[v->used_size++] = ft_strdup(item);
 }
 
 void	vector_add_at_index(t_vector *v, int index, char *item)
@@ -55,14 +68,4 @@ void	vector_add_at_index(t_vector *v, int index, char *item)
 	v->args[index] = ft_strdup(item);
 	if (v->used_size + 1 <= v->size)
 		v->used_size++;
-}
-
-void	free_vector(t_vector *v)
-{
-	int	i;
-
-	i = -1;
-	while (++i < v->size)
-		free(v->args[i]);
-	free(v->args);
 }

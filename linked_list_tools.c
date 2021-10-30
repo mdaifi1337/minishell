@@ -1,22 +1,34 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   linked_list_tools.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/10/26 16:17:20 by mdaifi            #+#    #+#             */
+/*   Updated: 2021/10/26 16:21:17 by mdaifi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redirect *redirect)
+void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redir *redir)
 {
 	t_cmd_line	*tmp;
 	t_cmd_line	*new;
-	t_redirect	*tmp_redir;
+	t_redir		*tmp_redir;
 
 	new = (t_cmd_line *)malloc(sizeof(t_cmd_line));
 	if (new == NULL)
 		return ;
-	new->redirect = NULL;
-	tmp_redir = redirect;
+	new->redir = NULL;
+	tmp_redir = redir;
 	while (tmp_redir)
 	{
-		lst_add_back_redirect(&new->redirect, tmp_redir->type, tmp_redir->file);
+		lst_add_back_redir(&new->redir, tmp_redir->type, tmp_redir->file);
 		tmp_redir = tmp_redir->next;
 	}
-	new->args = v;
+	new->args = copy_vector(v);
 	new->next = NULL;
 	tmp = *cmd_line;
 	if (*cmd_line == NULL)
@@ -29,20 +41,20 @@ void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redirect *redirect)
 	}
 }
 
-void	lst_add_back_redirect(t_redirect **redirect, t_type type, char *file)
+void	lst_add_back_redir(t_redir **redir, t_type type, char *file)
 {
-	t_redirect	*tmp;
-	t_redirect	*new;
+	t_redir	*tmp;
+	t_redir	*new;
 
-	new = (t_redirect *)malloc(sizeof(t_redirect));
+	new = (t_redir *)malloc(sizeof(t_redir));
 	if (new == NULL)
 		return ;
 	new->type = type;
 	new->file = ft_strdup(file);
 	new->next = NULL;
-	tmp = *redirect;
-	if (*redirect == NULL)
-		*redirect = new;
+	tmp = *redir;
+	if (*redir == NULL)
+		*redir = new;
 	else
 	{
 		while (tmp->next)
@@ -51,20 +63,27 @@ void	lst_add_back_redirect(t_redirect **redirect, t_type type, char *file)
 	}
 }
 
-void	free_cmd_line_list(t_cmd_line *cmd_line)
+void	lst_add_back_token(t_token **token_list, t_type type, char *str)
 {
-	int			i;
-	t_cmd_line	*tmp;
+	t_token	*new;
+	t_token	*tmp;
 
-	while (cmd_line)
+	new = (t_token *)malloc(sizeof(t_token));
+	new->token = ft_strdup(str);
+	new->type = type;
+	new->next = NULL;
+	new->prev = NULL;
+	tmp = *token_list;
+	if (*token_list == NULL)
 	{
-		tmp = cmd_line;
-		i = -1;
-		while (++i < cmd_line->args.size)
-			free(cmd_line->args.args[i]);
-		ft_free_redirect_list(cmd_line->redirect);
-		cmd_line->redirect = NULL;
-		cmd_line = cmd_line->next;
-		free(tmp);
+		new->prev = NULL;
+		*token_list = new;
+	}
+	else
+	{
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = new;
+		new->prev = tmp;
 	}
 }

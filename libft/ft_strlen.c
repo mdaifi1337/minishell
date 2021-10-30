@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/16 10:37:33 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/06/11 16:23:26 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/10/27 10:54:18 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ size_t	ft_strlen(const char *ch)
 	size_t	i;
 
 	i = 0;
+	if (!ch)
+		return (0);
 	while (ch[i])
 		i++;
 	return (i);

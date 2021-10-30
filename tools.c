@@ -1,41 +1,51 @@
 #include "minishell.h"
 
-void	ft_free_list(t_token *head)
+void	ft_free_redir_list(t_redir *head)
 {
-	t_token	*tmp;
-
-	tmp = head;
-	while (head != NULL)
-	{
-		tmp = head;
-		head = head->next;
-		free(tmp->token);
-		free(tmp);
-	}
-}
-
-void	ft_free_redirect_list(t_redirect *head)
-{
-	t_redirect	*tmp;
+	t_redir	*tmp;
 
 	while (head != NULL)
 	{
 		tmp = head;
 		head = head->next;
-		free(tmp->file);
+		if (tmp->file)
+			free(tmp->file);
 		free(tmp);
 	}
 }
 
-char	**copy_table(char **tab, int size)
+t_vector	copy_vector(t_vector v)
 {
-	char	**args;
-	int		i;
+	t_vector	res;
+	int			i;
 
-	args = (char **)malloc(sizeof(char *) * size + 1);
+	res.args = (char **)malloc(sizeof(char *) * v.size);
+	if (!res.args)
+		exit(1); //allocation error
 	i = -1;
-	while (++i < size)
-		args[i] = ft_strdup(tab[i]);
-	args[i] = NULL;
-	return (args);
+	while (++i < v.used_size)
+		res.args[i] = ft_strdup(v.args[i]);
+	res.used_size = v.used_size;
+	res.size = v.size;
+	return(res);
+}
+
+t_char_vec	new_char_vec(t_vector *v, int i, int *j)
+{
+	t_char_vec	res;
+
+	init_char_vec(&res);
+	*j = -1;
+	while (v->args[i][++(*j)] && v->args[i][(*j)] != '$')
+		char_vec_add(&res, v->args[i][(*j)]);
+	(*j)++;
+	while ((ft_isalnum(v->args[i][(*j)]) || v->args[i][(*j)] == '_')
+		&& v->args[i][(*j)])
+		(*j)++;
+	if (v->args[i][(*j)] == '\\' && v->args[i][(*j)] != '?')
+		(*j)++;
+	(*j)--;
+	while (v->args[i][++(*j)])
+		char_vec_add(&res, v->args[i][(*j)]);
+	return (res);
 }
