@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 16:18:01 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 13:56:17 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/10/30 17:37:53 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,10 +62,10 @@ void	vector_add(t_vector *v, char *item)
 	v->args[v->used_size++] = ft_strdup(item);
 }
 
-void	vector_add_at_index(t_vector *v, int index, char *item)
+void	vector_add_at_index(t_vector *v, char *item)
 {
-	free(v->args[index]);
-	v->args[index] = ft_strdup(item);
+	free(v->args[v->i]);
+	v->args[v->i] = ft_strdup(item);
 	if (v->used_size + 1 <= v->size)
 		v->used_size++;
 }

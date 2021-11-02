@@ -6,28 +6,36 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 16:17:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/26 16:21:17 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/10/30 18:25:07 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+static void	copy_redir_list(t_cmd_line *cmd_line, t_redir *redir)
+{
+	t_redir		*tmp_redir;
+
+	tmp_redir = redir;
+	while (tmp_redir)
+	{
+		lst_add_back_redir(&cmd_line->redir, tmp_redir->type, tmp_redir->file);
+		tmp_redir = tmp_redir->next;
+	}
+}
+
 void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redir *redir)
 {
 	t_cmd_line	*tmp;
 	t_cmd_line	*new;
-	t_redir		*tmp_redir;
 
 	new = (t_cmd_line *)malloc(sizeof(t_cmd_line));
 	if (new == NULL)
 		return ;
-	new->redir = NULL;
-	tmp_redir = redir;
-	while (tmp_redir)
-	{
-		lst_add_back_redir(&new->redir, tmp_redir->type, tmp_redir->file);
-		tmp_redir = tmp_redir->next;
-	}
+	if (redir == NULL)
+		new->redir = NULL;
+	else
+		copy_redir_list(new, redir);
 	new->args = copy_vector(v);
 	new->next = NULL;
 	tmp = *cmd_line;

@@ -6,19 +6,21 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 13:13:56 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 14:04:37 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/10/30 18:47:48 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	insert_dollar_vars_in_vector(t_vector *v, int size, int curr_pos)
+void	insert_dollar_vars_in_vector(t_vector *v, int size)
 {
 	int	i;
 	int	j;
+	int	curr_pos;
 
+	curr_pos = v->i;
 	if (v->used_size + size > v->size)
-		vector_resize(v, v->size + size);
+		vector_resize(v, v->used_size + size);
 	if (size > 1)
 	{
 		i = (v->used_size + size) - 1;
@@ -37,6 +39,7 @@ void	insert_dollar_vars_in_vector(t_vector *v, int size, int curr_pos)
 void	ignore_dollar_var(t_vector *v)
 {
 	int			i;
+	int			j;
 	t_char_vec	res;
 
 	printf("Ignore\n");
@@ -54,6 +57,7 @@ void	ignore_dollar_var(t_vector *v)
 void	resize_vec_when_dollar_var_empty(t_vector *v)
 {
 	int			i;
+	int			j;
 	t_char_vec	res;
 
 	printf("Empty\n");
@@ -81,16 +85,17 @@ void	resize_vec_when_dollar_var_empty(t_vector *v)
 void	dollar_var_not_found(t_vector *v)
 {
 	int			i;
+	int			j;
 	t_char_vec	res;
 
 	printf("not found\n");
 	i = v->i;
 	res = new_char_vec(v);
-	if (res.arg[0] != '\0')
+	if (res.arg[0] != '\0' || (res.arg[0] == '\"' && ft_strlen(res.arg) > 1))
 	{
-		free(v->args[v->i]);
-		v->args[v->i] = ft_strdup(res.arg);
-		i++;
+		printf("res : %c\n", res.arg[0]);
+		free(v->args[i]);
+		v->args[i] = ft_strdup(res.arg);
 	}
 	else
 	{

@@ -6,27 +6,26 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/27 14:57:05 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/27 15:04:07 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/10/30 18:41:14 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-
-static void	skip_quotes(char c, int *j, int *dquote, int *squote)
+static void	skip_quotes(char *str, int *j, int *dquote, int *squote)
 {
-
-	if (c == '\'' && !(*dquote))
+	while (str[*j] == '\'' && !(*dquote))
 	{
 		*squote = 1 - *squote;
 		(*j)++;
 	}
-	if (c == '\"' && !(*squote))
+	while (str[*j] == '\"' && !(*squote))
 	{
 		*dquote = 1 - *dquote;
 		(*j)++;
 	}
 }
+
 void	remove_quotes(t_vector *v)
 {
 	int			i;
@@ -42,9 +41,9 @@ void	remove_quotes(t_vector *v)
 	{
 		init_char_vec(&new_char_vec);
 		j = -1;
-		while (v->args[i][++j])
+		while (++j < ft_strlen(v->args[i]))
 		{
-			skip_quotes(v->args[i][j], &j, &dquote, &squote);
+			skip_quotes(v->args[i], &j, &dquote, &squote);
 			char_vec_add(&new_char_vec, v->args[i][j]);
 		}
 		free(v->args[i]);

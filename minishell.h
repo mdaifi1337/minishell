@@ -1,10 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/10/30 18:16:36 by mdaifi            #+#    #+#             */
+/*   Updated: 2021/10/30 18:25:53 by mdaifi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_
+# define MINISHELL_
 # include <stdio.h>
 # include <stdlib.h>
 # include <fcntl.h>
 # include "libft/libft.h"
 # include <readline/readline.h>
 # include <readline/history.h>
+# define debug printf("DEBUG\n");
 
 typedef enum e_type
 {
@@ -21,12 +35,13 @@ typedef struct s_vector {
 	char		**args;
 	int			size;
 	int			used_size;
+	int			i;
 }t_vector;
 
 typedef struct s_redir
 {
-	t_type					type;
-	char					*file;
+	t_type				type;
+	char				*file;
 	struct s_redir		*next;
 }t_redir;
 
@@ -34,8 +49,7 @@ typedef struct s_redir
 typedef struct	s_cmd_line
 {
 	t_vector			args;
-	int					i;
-	t_redir			*redir;
+	t_redir				*redir;
 	struct s_cmd_line	*next;
 }t_cmd_line;
 
@@ -50,7 +64,7 @@ typedef	struct	s_token
 int		check_nbr_of_quotes(char *str);
 int		check_token_syntax(t_token *token);
 void	remove_quotes(t_vector *v);
-void	double_free(char **tab, int size);
+void	free_array_of_strings(char **tab, int size);
 void	ft_free_list(t_token *head);
 void	ft_free_redir_list(t_redir *head);
 void	free_cmd_line_list(t_cmd_line *cmd_line);
@@ -61,17 +75,20 @@ void	init_char_vec(t_char_vec *char_vec);
 void	vector_init(t_vector *v);
 void	vector_add(t_vector *v, char *item);
 void	vector_resize(t_vector *v, int size);
-void	vector_add_at_index(t_vector *v, int index, char *item);
+void	vector_add_at_index(t_vector *v, char *item);
 void	lst_add_back_redir(t_redir **redir, t_type type, char *file);
 void	lst_add_back_token(t_token **token_list, t_type type, char *str);
 void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redir *redir);
-void	ignore_dollar_var(t_vector *v, int i);
-void	dollar_var_not_found(t_vector *v, int i);
-void	resize_vec_when_dollar_var_empty(t_vector *v, int i);
-void	insert_dollar_vars_in_vector(t_vector *v, int size, int curr_pos);
-void	replace_dollar_var(t_vector *v, int curr_pos, char *name, char *value);
+void	ignore_dollar_var(t_vector *v);
+void	dollar_var_not_found(t_vector *v);
+void	look_for_expandable_vars(t_cmd_line *cmd_line);
+void	split_dollar_var(t_vector *v, int curr_pos, char *value);
+void	resize_vec_when_dollar_var_empty(t_vector *v);
+void	insert_dollar_vars_in_vector(t_vector *v, int size);
+void	replace_dollar_var(t_vector *v, char *name, char *value);
 t_vector	copy_vector(t_vector v);
-t_char_vec	new_char_vec(t_vector *v, int i, int *j);
+t_char_vec	new_char_vec(t_vector *v);
+t_type	redirections(char *str, int i);
 t_cmd_line	*treat_pipe_sequence(t_token *token_list);
 
 #endif
