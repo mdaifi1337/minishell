@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/23 20:04:19 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/06/11 16:52:04 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/06 10:27:05 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ char	**ft_split(char const *s, char c)
 	if (!s)
 		return (NULL);
 	tmp = NULL;
-	tmp = (char *)s;
+	tmp = ft_strtrim(s, &c);
 	if (tmp != NULL)
 	{
 		while (tmp[i])
