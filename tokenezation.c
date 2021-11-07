@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:20:53 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/04 10:28:07 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/06 14:45:15 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,12 @@ int	main(int argc, char *argv[], char *env[])
 			else
 			{
 				token_list = tokenize_command_line(str);
+				token_tmp = token_list;
+				while (token_tmp)
+				{
+					printf("token : %s\n", token_tmp->token);
+					token_tmp = token_tmp->next;
+				}
 				if (token_list && !check_token_syntax(token_list))
 					free_token_list(token_list);
 				else if (token_list)

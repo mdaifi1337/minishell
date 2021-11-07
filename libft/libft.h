@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/20 22:29:59 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/09/30 15:44:48 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/06 11:21:19 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ char	**ft_split(char const *s, char c);
 char	*ft_strchr(const char *str, int c);
 char	*ft_strrchr(const char *str, int c);
 char	*ft_strjoin(char const *s1, char const *s2);
+char	*ft_strjoin_new_line(char const *s1, char const *s2);
+char	*ft_strjoin_backslash(char const *s1, char const *s2);
 char	*ft_strtrim(char const *s1, char const *set);
 char	*ft_strnstr(const char *s1, const char *s2, size_t len);
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
@@ -60,8 +62,8 @@ void	*ft_memmove(void *dst, const void *src, size_t len);
 void	*ft_memccpy(void *dst, const void *src, int c, size_t n);
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void*));
-void	ft_lstadd_back(t_list **alst, t_list *new);
-void	ft_lstadd_front(t_list **alst, t_list *new);
+void	ft_lstadd_back(t_list **alst, t_list *new_element);
+void	ft_lstadd_front(t_list **alst, t_list *new_element);
 void	ft_lstdelone(t_list *lst, void (*del)(void*));
 t_list	*ft_lstlast(t_list *lst);
 t_list	*ft_lstnew(void *content);
