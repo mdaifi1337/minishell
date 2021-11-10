@@ -1,42 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strtrim.c                                       :+:      :+:    :+:   */
+/*   ft_strcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/22 21:38:42 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/07 10:54:39 by mdaifi           ###   ########.fr       */
+/*   Created: 2021/11/07 14:48:28 by mdaifi            #+#    #+#             */
+/*   Updated: 2021/11/10 16:07:53 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strtrim(char const *s1, char const *set)
+int	ft_strcmp(const char *s1, const char *s2)
 {
-	int		i;
-	int		j;
-	int		end;
+	size_t	i;
 
 	i = 0;
-	j = 0;
-	if (!s1)
-		return (ft_strdup(""));
-	end = ft_strlen(s1) - 1;
-	while (set[j] && i <= end)
+	while (s1[i] || s2[i])
 	{
-		if (set[j] == s1[i])
-		{
-			i++;
-			j = 0;
-		}
-		if (set[j] == s1[end])
-		{
-			end--;
-			j = 0;
-		}
-		else if (set[j] != s1[i] && set[j] != s1[end])
-			j++;
+		if (s1[i] != s2[i])
+			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+		i++;
 	}
-	return (ft_substr(s1, i, (end - i + 1)));
+	return (0);
 }

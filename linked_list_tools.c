@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 16:17:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 18:25:07 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/10 15:54:02 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,4 +94,17 @@ void	lst_add_back_token(t_token **token_list, t_type type, char *str)
 		tmp->next = new;
 		new->prev = tmp;
 	}
+}
+
+int	ft_lst_size(t_cmd_line *lst)
+{
+	int		size;
+
+	size = 0;
+	while (lst)
+	{
+		lst = lst->next;
+		size++;
+	}
+	return (size);
 }

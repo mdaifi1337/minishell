@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 13:13:56 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 18:47:48 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/10 16:41:53 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,6 @@ void	ignore_dollar_var(t_vector *v)
 	int			j;
 	t_char_vec	res;
 
-	printf("Ignore\n");
 	i = v->i;
 	res = new_char_vec(v);
 	if (res.arg[0] != '\0')
@@ -60,7 +59,6 @@ void	resize_vec_when_dollar_var_empty(t_vector *v)
 	int			j;
 	t_char_vec	res;
 
-	printf("Empty\n");
 	i = v->i;
 	res = new_char_vec(v);
 	if (res.arg[0] != '\0')
@@ -88,12 +86,10 @@ void	dollar_var_not_found(t_vector *v)
 	int			j;
 	t_char_vec	res;
 
-	printf("not found\n");
 	i = v->i;
 	res = new_char_vec(v);
 	if (res.arg[0] != '\0' || (res.arg[0] == '\"' && ft_strlen(res.arg) > 1))
 	{
-		printf("res : %c\n", res.arg[0]);
 		free(v->args[i]);
 		v->args[i] = ft_strdup(res.arg);
 	}
@@ -116,7 +112,6 @@ void	replace_dollar_var(t_vector *v, char *name, char *value)
 	char		*tmp;
 	t_char_vec	new_char_vec;
 
-	printf("replace\n");
 	tmp = ft_strdup(v->args[v->i]);
 	init_char_vec(&new_char_vec);
 	i = -1;

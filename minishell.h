@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:16:36 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 18:25:53 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/10 16:37:13 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,13 @@ typedef struct	s_cmd_line
 	struct s_cmd_line	*next;
 }t_cmd_line;
 
+typedef struct s_var
+{
+	int			stat;
+	int			original_stdin;
+	pid_t		pid;
+}t_var;
+
 typedef	struct	s_token
 {
 	char			*token;
@@ -61,31 +68,58 @@ typedef	struct	s_token
 	struct s_token	*next;
 }t_token;
 
+extern t_var	g_var;
+t_var	g_var;
+int		ft_lst_size(t_cmd_line *lst);
 int		check_nbr_of_quotes(char *str);
+int		check_built_ins(t_cmd_line *cmd);
 int		check_token_syntax(t_token *token);
+char	**copy_array(char **tab, int size);
+char	*search_for_path_in_env(char **env);
+char	*search_path_of_cmd(char *str, char *env);
+void 	path_not_found(char *path);
 void	remove_quotes(t_vector *v);
 void	free_array_of_strings(char **tab, int size);
 void	ft_free_list(t_token *head);
+void	fd_error(int fd);
+void	child_sig(int sig);
+void 	parent_sig(int sig);
 void	ft_free_redir_list(t_redir *head);
 void	free_cmd_line_list(t_cmd_line *cmd_line);
 void	free_token_list(t_token *head);
 void	free_vector(t_vector *v);
 void	char_vec_add(t_char_vec *char_vec, char c);
+void	exec_redir(t_redir *redir, t_vector *path);
 void	init_char_vec(t_char_vec *char_vec);
 void	vector_init(t_vector *v);
+void	cd_home(t_vector *path);
 void	vector_add(t_vector *v, char *item);
+void	vector_delete(t_vector *v, int index);
+void	check_cmd(t_cmd_line *cmd, t_vector *path);
+void	check_permissions(char *file, char *permission);
 void	vector_resize(t_vector *v, int size);
 void	vector_add_at_index(t_vector *v, char *item);
+void	built_ins(t_cmd_line *cmd_line, t_vector *path);
+void	execute_cmd(char **env, t_cmd_line *cmd_line);
 void	lst_add_back_redir(t_redir **redir, t_type type, char *file);
 void	lst_add_back_token(t_token **token_list, t_type type, char *str);
 void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redir *redir);
+void	execute_second_cmd(t_cmd_line *cmd_line, t_vector *path, int *p, int size);
 void	ignore_dollar_var(t_vector *v);
+void	cmd_unset(t_cmd_line *cmd, t_vector *path);
+void	cmd_env(t_cmd_line *cmd_line, t_vector *path);
+void	cmd_echo(t_cmd_line *cmd);
+void	cmd_pwd(t_cmd_line *cmd_line);
+void	cmd_exit(t_cmd_line *cmd_line);
+void	cmd_export(t_cmd_line *cmd, t_vector *path);
+void	cmd_cd(t_cmd_line *cmd_line, t_vector *path);
 void	dollar_var_not_found(t_vector *v);
 void	look_for_expandable_vars(t_cmd_line *cmd_line);
 void	split_dollar_var(t_vector *v, int curr_pos, char *value);
 void	resize_vec_when_dollar_var_empty(t_vector *v);
 void	insert_dollar_vars_in_vector(t_vector *v, int size);
 void	replace_dollar_var(t_vector *v, char *name, char *value);
+t_vector	*env_copy(char *env[]);
 t_vector	copy_vector(t_vector v);
 t_char_vec	new_char_vec(t_vector *v);
 t_type	redirections(char *str, int i);

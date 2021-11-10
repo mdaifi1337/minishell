@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 16:18:01 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 17:37:53 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/10 15:13:25 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,24 @@ void	vector_add_at_index(t_vector *v, char *item)
 	v->args[v->i] = ft_strdup(item);
 	if (v->used_size + 1 <= v->size)
 		v->used_size++;
+}
+
+void	vector_delete(t_vector *v, int index)
+{
+	int	i;
+
+    if (index < 0 || index >= v->used_size)
+        return;
+	free(v->args[index]);
+	i = index;
+    while (i < v->used_size - 1)
+	{
+        v->args[i] = ft_strdup(v->args[i + 1]);
+		free(v->args[i + 1]);
+        v->args[i + 1] = NULL;
+		i++;
+    }
+    v->used_size--;
+    if (v->used_size > 0 && v->used_size == v->size / 4)
+        vector_resize(v, v->size / 2);
 }

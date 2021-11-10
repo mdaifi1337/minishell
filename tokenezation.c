@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:20:53 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/06 14:45:15 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/10 16:44:55 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,40 +117,48 @@ void	print_cmd_lines(t_cmd_line *cmd_line)
 	}
 }
 
+void	init_gloval_struct(void)
+{
+	g_var.pid = 0;
+	g_var.original_stdin = 0;
+	g_var.stat = 0;
+}
+
 int	main(int argc, char *argv[], char *env[])
 {
 	t_cmd_line	*cmd_line;
 	t_token		*token_list;
-	t_token		*token_tmp;
+	t_vector	*path;
 	char		*str;
-	int			ok;
+	int			true;
 
-	ok = 1;
+	true = 1;
 	cmd_line = NULL;
-	while (ok)
+	init_gloval_struct();
+	path = env_copy(env);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGINT, parent_sig);
+	while (true)
 	{
 		str = readline("minishell > ");
-		if (ft_strlen(str))
+		if (!str)
+			exit(1);
+		else if (ft_strlen(str))
 		{
 			add_history(str);
 			if (!ft_strncmp(str, "exit", 5))
-				ok = 0;
+				true = 0;
 			else
 			{
 				token_list = tokenize_command_line(str);
-				token_tmp = token_list;
-				while (token_tmp)
-				{
-					printf("token : %s\n", token_tmp->token);
-					token_tmp = token_tmp->next;
-				}
 				if (token_list && !check_token_syntax(token_list))
 					free_token_list(token_list);
 				else if (token_list)
 				{
 					cmd_line = treat_pipe_sequence(token_list);
 					look_for_expandable_vars(cmd_line);
-					print_cmd_lines(cmd_line);
+					check_cmd(cmd_line, path);
+					// print_cmd_lines(cmd_line);
 					free(str);
 					free_cmd_line_list(cmd_line);
 				}

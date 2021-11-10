@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:33:17 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/01 08:25:50 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/10 16:43:21 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,37 @@ t_char_vec	new_char_vec(t_vector *v)
 		j++;
 	j--;
 	add_chars_after_dollar_var_name(v, &res, j);
-	printf("char vec : %s\n", res.arg);
 	return (res);
+}
+
+t_vector	*env_copy(char *env[])
+{
+	int			i;
+	t_vector	*path;
+
+	i = 0;
+	path = (t_vector *)malloc(sizeof(t_vector));
+	if (!path)
+		return (NULL);
+	vector_init(path);
+	while (env[i])
+	{
+		vector_add(path, env[i]);
+		i++;
+	}
+	return (path);
+}
+
+void	cd_home(t_vector *path)
+{
+	int		i;
+	char	*tmp;
+
+	i = 0;
+	while (path->args[i++])
+		if (ft_strncmp(path->args[3], "HOME=", 5))
+			tmp = ft_substr(path->args[2], 5, \
+				ft_strlen(path->args[2]) - 5);
+	if (tmp)
+		chdir(tmp);
 }
