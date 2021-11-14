@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/25 14:48:21 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 15:07:47 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 11:07:45 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,12 @@ void	free_array_of_strings(char **tab, int size)
 
 	i = -1;
 	while (++i < size)
-		free(tab[i]);
+	{
+		if (tab[i])
+			free(tab[i]);
+	}
 	free(tab);
+	tab = NULL;
 }
 
 void	free_vector(t_vector *v)
@@ -58,13 +62,12 @@ void	free_cmd_line_list(t_cmd_line *cmd_line)
 	{
 		tmp = cmd_line;
 		i = -1;
-		while (++i < cmd_line->args.size)
+		while (++i < cmd_line->args.used_size)
 		{
-			if (cmd_line->args.used_size)
+			if (cmd_line->args.args[i])
 				free(cmd_line->args.args[i]);
 		}
 		ft_free_redir_list(cmd_line->redir);
-		cmd_line->redir = NULL;
 		cmd_line = cmd_line->next;
 		free(tmp);
 	}
@@ -74,7 +77,7 @@ void	ft_free_redir_list(t_redir *head)
 {
 	t_redir	*tmp;
 
-	while (head != NULL)
+	while (head)
 	{
 		tmp = head;
 		head = head->next;

@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 13:15:06 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 18:21:27 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 10:15:57 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static void	expand_dollar_var(t_vector *v)
 	}
 }
 
-void	look_for_expandable_vars(t_cmd_line *cmd_line)
+void	look_for_expandable_vars(t_cmd_line *cmd_line, t_vector *env)
 {
 	int			i;
 	t_cmd_line	*tmp;
@@ -62,7 +62,10 @@ void	look_for_expandable_vars(t_cmd_line *cmd_line)
 	{
 		tmp->args.i = -1;
 		while (++tmp->args.i < tmp->args.used_size)
+		{
+			replace_path(&tmp->args, env, tmp->args.i);
 			expand_dollar_var(&tmp->args);
+		}
 		remove_quotes(&tmp->args);
 		tmp = tmp->next;
 	}

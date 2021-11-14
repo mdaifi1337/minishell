@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:16:36 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 16:37:13 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 15:38:02 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define MINISHELL_
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # include <fcntl.h>
 # include "libft/libft.h"
 # include <readline/readline.h>
@@ -55,9 +56,12 @@ typedef struct	s_cmd_line
 
 typedef struct s_var
 {
-	int			stat;
-	int			original_stdin;
-	pid_t		pid;
+	int		size;
+	int		stat;
+	int		reset;
+	int		heredoc;
+	int		original_stdin;
+	pid_t	pid;
 }t_var;
 
 typedef	struct	s_token
@@ -96,7 +100,7 @@ void	cd_home(t_vector *path);
 void	vector_add(t_vector *v, char *item);
 void	vector_delete(t_vector *v, int index);
 void	check_cmd(t_cmd_line *cmd, t_vector *path);
-void	check_permissions(char *file, char *permission);
+void	check_permissions(t_redir *redir);
 void	vector_resize(t_vector *v, int size);
 void	vector_add_at_index(t_vector *v, char *item);
 void	built_ins(t_cmd_line *cmd_line, t_vector *path);
@@ -104,7 +108,7 @@ void	execute_cmd(char **env, t_cmd_line *cmd_line);
 void	lst_add_back_redir(t_redir **redir, t_type type, char *file);
 void	lst_add_back_token(t_token **token_list, t_type type, char *str);
 void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redir *redir);
-void	execute_second_cmd(t_cmd_line *cmd_line, t_vector *path, int *p, int size);
+void	execute_second_cmd(t_cmd_line *cmd_line, t_vector *path);
 void	ignore_dollar_var(t_vector *v);
 void	cmd_unset(t_cmd_line *cmd, t_vector *path);
 void	cmd_env(t_cmd_line *cmd_line, t_vector *path);
@@ -113,8 +117,9 @@ void	cmd_pwd(t_cmd_line *cmd_line);
 void	cmd_exit(t_cmd_line *cmd_line);
 void	cmd_export(t_cmd_line *cmd, t_vector *path);
 void	cmd_cd(t_cmd_line *cmd_line, t_vector *path);
+void	replace_path(t_vector *path, t_vector *env, int i);
 void	dollar_var_not_found(t_vector *v);
-void	look_for_expandable_vars(t_cmd_line *cmd_line);
+void	look_for_expandable_vars(t_cmd_line *cmd_line, t_vector *env);
 void	split_dollar_var(t_vector *v, int curr_pos, char *value);
 void	resize_vec_when_dollar_var_empty(t_vector *v);
 void	insert_dollar_vars_in_vector(t_vector *v, int size);

@@ -6,31 +6,31 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/10 15:09:59 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 17:20:38 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 12:20:03 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	ft_pipe(t_cmd_line *cmd, t_vector *path, int size)
+static void	ft_pipe(t_cmd_line *cmd, t_vector *path)
 {
 	char			**tmp2;
 	int				p[2];
 
 	fd_error(pipe(p));
-	execute_second_cmd(cmd, path, p, size);
+	execute_second_cmd(cmd, path);
 }
 
 void	check_cmd(t_cmd_line *cmd, t_vector *path)
 {
 	int	ret;
-	int	size;
 
-	size = ft_lst_size(cmd);
-	if (check_built_ins(cmd) && size == 1 && cmd->args.args[0][0] != '.')
+	g_var.size = ft_lst_size(cmd);
+	if ((check_built_ins(cmd) && g_var.size == 1 && !cmd->redir)
+		&& cmd->args.args[0][0] != '.')
 		built_ins(cmd, path);
 	else
-		ft_pipe(cmd, path, size);
+		ft_pipe(cmd, path);
 }
 
 int	check_built_ins(t_cmd_line *cmd)
@@ -48,6 +48,8 @@ int	check_built_ins(t_cmd_line *cmd)
 	else if (!ft_strcmp(cmd->args.args[0], "."))
 		return (1);
 	else if (!ft_strcmp(cmd->args.args[0], "unset"))
+		return (1);
+	else if (!ft_strcmp(cmd->args.args[0], "exit"))
 		return (1);
 	return (0);
 }

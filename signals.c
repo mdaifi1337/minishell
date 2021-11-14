@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/06 10:43:18 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 16:44:53 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/11 15:15:01 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,10 @@ void	child_sig(int sig)
 {
 	if (sig == SIGINT && g_var.pid == 0)
 	{
-		write(1, "\n", 1);
+		write(1, "\n", 2);
 		g_var.stat = 130;
+		if (g_var.heredoc == 1)
+			g_var.stat = 1;
 	}
 	else if (sig == SIGQUIT && g_var.pid == 0)
 	{
@@ -29,6 +31,8 @@ void	child_sig(int sig)
 
 void parent_sig(int sig)
 {
+	if (g_var.heredoc == 1)
+		g_var.stat = 1;
 	write(1, "\n", 2);
 	rl_on_new_line();
 	rl_replace_line("", 0);

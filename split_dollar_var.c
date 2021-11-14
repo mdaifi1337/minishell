@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 13:17:09 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 18:15:44 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 09:06:20 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,11 @@ static void	dollar_var_has_multiple_values(t_vector *v, t_char_vec *new,
 		vector_add_at_index(v, new->arg);
 	}
 	else
+	{
+		free(v->args[v->i]);
 		v->args[v->i] = ft_strdup(tab[size - 1]);
+	}
+	free(tmp);
 }
 
 static void	dollar_var_has_only_one_value(t_vector *v, t_char_vec *new,
@@ -103,9 +107,8 @@ void	dollar_var_is_not_empty(t_vector *v, char **tab, int curr_pos)
 
 void	split_dollar_var(t_vector *v, int curr_pos, char *value)
 {
-	char		**tab;
+	char	**tab;
 
-	printf("split\n");
 	tab = ft_split(value, ' ');
 	if (tab[0])
 		dollar_var_is_not_empty(v, tab, curr_pos);

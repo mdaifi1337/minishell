@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 16:17:20 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 15:54:02 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 12:47:34 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static void	copy_redir_list(t_cmd_line *cmd_line, t_redir *redir)
 {
-	t_redir		*tmp_redir;
+	t_redir	*tmp_redir;
 
 	tmp_redir = redir;
 	while (tmp_redir)
@@ -32,9 +32,8 @@ void	lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redir *redir)
 	new = (t_cmd_line *)malloc(sizeof(t_cmd_line));
 	if (new == NULL)
 		return ;
-	if (redir == NULL)
-		new->redir = NULL;
-	else
+	new->redir = NULL;
+	if (redir)
 		copy_redir_list(new, redir);
 	new->args = copy_vector(v);
 	new->next = NULL;

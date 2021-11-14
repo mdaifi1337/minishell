@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/10 14:29:21 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 17:24:15 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/13 12:45:23 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ void	built_ins(t_cmd_line *cmd_line, t_vector *path)
 		execute_cmd(path->args, cmd_line);
 	else if (!ft_strcmp(cmd_line->args.args[0], "unset"))
 		cmd_unset(cmd_line, path);
+	else if (!ft_strcmp(cmd_line->args.args[0], "exit"))
+		cmd_exit(cmd_line);
 }
 
 static void	env_err(t_cmd_line *cmd_line)
@@ -38,11 +40,11 @@ static void	env_err(t_cmd_line *cmd_line)
 		exit(126);
 	}
 	// else if (!ft_strncmp(cmd_line->args[ft_strlen(cmd_line->args[1])],"/", 1))
-    // {
-    //     printf("hello\n");
-    //     printf("%s: .: Permission denied\n", cmd_line->args[0]);
-    //     exit(126);
-    // }
+	// {
+	//     printf("hello\n");
+	//     printf("%s: .: Permission denied\n", cmd_line->args[0]);
+	//     exit(126);
+	// }
 	else
 	{
 		printf("%s: %s: No such file or directory\n", \
@@ -75,12 +77,14 @@ void	cmd_unset(t_cmd_line *cmd, t_vector *path)
 	int			i;
 
 	i = 0;
-	while (path->args[i])
+	while (i < path->used_size)
 	{
-		if (!cmd->args.args[1] || !ft_strcmp(cmd->args.args[1], path->args[i]))
+		if (cmd->args.used_size == 1 || !ft_strncmp(cmd->args.args[1],
+				path->args[i], ft_strlen(cmd->args.args[1])))
 			break ;
 		i++;
 	}
-	vector_delete(path, i);
+	if (cmd->args.used_size > 1)
+		vector_delete(path, i);
 	g_var.stat = 0;
 }

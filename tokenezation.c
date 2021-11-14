@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:20:53 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 16:44:55 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 15:14:10 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,10 +83,12 @@ t_token	*tokenize_command_line(char *str)
 			token = get_token(str, &i, &type);
 			if (!check_nbr_of_quotes(token))
 			{
+				free(token);
 				free_token_list(token_list);
 				return (NULL);
 			}
 			lst_add_back_token(&token_list, type, token);
+			free(token);
 		}
 	}
 	lst_add_back_token(&token_list, e_end, "newline");
@@ -100,6 +102,7 @@ void	print_cmd_lines(t_cmd_line *cmd_line)
 	t_redir		*tmp_redir;
 
 	tmp = cmd_line;
+		debug
 	while (tmp)
 	{
 		i = -1;
@@ -117,11 +120,12 @@ void	print_cmd_lines(t_cmd_line *cmd_line)
 	}
 }
 
-void	init_gloval_struct(void)
+void	init_global_struct(void)
 {
 	g_var.pid = 0;
 	g_var.original_stdin = 0;
 	g_var.stat = 0;
+	g_var.heredoc = 0;
 }
 
 int	main(int argc, char *argv[], char *env[])
@@ -134,8 +138,8 @@ int	main(int argc, char *argv[], char *env[])
 
 	true = 1;
 	cmd_line = NULL;
-	init_gloval_struct();
 	path = env_copy(env);
+	init_global_struct();
 	signal(SIGQUIT, SIG_IGN);
 	signal(SIGINT, parent_sig);
 	while (true)
@@ -146,23 +150,22 @@ int	main(int argc, char *argv[], char *env[])
 		else if (ft_strlen(str))
 		{
 			add_history(str);
-			if (!ft_strncmp(str, "exit", 5))
-				true = 0;
-			else
+			token_list = tokenize_command_line(str);
+			if (token_list && !check_token_syntax(token_list))
+				free_token_list(token_list);
+			else if (token_list)
 			{
-				token_list = tokenize_command_line(str);
-				if (token_list && !check_token_syntax(token_list))
-					free_token_list(token_list);
-				else if (token_list)
+				cmd_line = treat_pipe_sequence(token_list);
+				free_token_list(token_list);
+				if (cmd_line)
 				{
-					cmd_line = treat_pipe_sequence(token_list);
-					look_for_expandable_vars(cmd_line);
-					check_cmd(cmd_line, path);
+					look_for_expandable_vars(cmd_line, path);
 					// print_cmd_lines(cmd_line);
-					free(str);
+					check_cmd(cmd_line, path);
 					free_cmd_line_list(cmd_line);
 				}
 			}
+			free(str);
 		}
 	}
 	return (0);

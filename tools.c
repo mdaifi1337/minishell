@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:33:17 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 16:43:21 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 11:43:42 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,11 +75,11 @@ t_vector	*env_copy(char *env[])
 	int			i;
 	t_vector	*path;
 
-	i = 0;
 	path = (t_vector *)malloc(sizeof(t_vector));
 	if (!path)
 		return (NULL);
 	vector_init(path);
+	i = 0;
 	while (env[i])
 	{
 		vector_add(path, env[i]);
@@ -94,10 +94,18 @@ void	cd_home(t_vector *path)
 	char	*tmp;
 
 	i = 0;
-	while (path->args[i++])
-		if (ft_strncmp(path->args[3], "HOME=", 5))
-			tmp = ft_substr(path->args[2], 5, \
-				ft_strlen(path->args[2]) - 5);
+	tmp = NULL;
+	while (i < path->used_size)
+	{
+		if (!ft_strncmp(path->args[i], "HOME=", 5))
+		{
+			tmp = ft_substr(path->args[i], 5, \
+				ft_strlen(path->args[i]) - 5);
+		}
+		i++;
+	}
 	if (tmp)
 		chdir(tmp);
+	else
+		printf("minishell: cd: HOME not set\n");
 }

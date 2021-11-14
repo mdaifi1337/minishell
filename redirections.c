@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:25:24 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 14:56:30 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 15:11:00 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,39 @@ t_type	redirections(char *str, int i)
 	return (e_word);
 }
 
+static void	heredocs(char *file, char **str)
+{
+	char	*tmp;
+	char	*buff;
+
+	*str = NULL;
+	while (1)
+	{
+		buff = readline("> ");
+		if (!buff || !ft_strcmp(file, buff))
+			break;
+		if (!*str)
+			*str = ft_strdup(buff);
+		else
+		{
+			tmp = *str;
+			*str = ft_strjoin_new_line(*str, buff);
+			free(tmp);
+		}
+		free(buff);
+	}
+	*str = ft_strjoin_new_line(*str, "");
+}
+
 void exec_redir(t_redir *redir, t_vector *path)
 {
-	int fd;
-	int i;
-	char *tmp;
-	int p[2];
-	char *str;
+	int		fd;
+	int		i;
+	int		p[2];
+	char	*str;
 
 	i = 0;
 	pipe(p);
-	str = NULL;
 	while (redir)
 	{
 		if (redir->type == e_dgreat)
@@ -52,38 +74,27 @@ void exec_redir(t_redir *redir, t_vector *path)
 		}
 		else if (redir->type == e_dless)
 		{
-			while (1)
-			{
-				tmp = readline("> ");
-				if (!ft_strcmp(redir->file, tmp) || !tmp)
-					break;
-				if (str)
-					str = ft_strdup(tmp);
-				else
-					str = ft_strjoin_new_line(str, tmp);
-			}
-			str = ft_strjoin_new_line(str, "");
+			g_var.heredoc = 1;
+			heredocs(redir->file, &str);
 			write(p[1], str, ft_strlen(str));
-			dup2(p[0], 0);
+			dup2(p[0], g_var.original_stdin);
 			close(p[1]);
 			close(p[0]);
 			i = 0;
 		}
-		else if (redir->type == e_less)
+		else if (redir->type == e_less && !redir->next)
 		{
 			fd = open(redir->file, O_RDONLY, 0755);
 			dup2(fd, 0);
 		}
 		if (redir->type != e_dless && redir->type != e_less && i != 0)
 		{
-			if (redir->type == e_less)
-				check_permissions(redir->file, "read");
-			else if (redir->type == e_great)
-				check_permissions(redir->file, "write");
+			check_permissions(redir);
 			fd_error(fd);
 		}
 		redir = redir->next;
 	}
 	if (i != 0)
 		dup2(fd, 1);
+	// close(fd);
 }

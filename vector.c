@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 16:18:01 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 15:13:25 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 16:00:38 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,39 +20,28 @@ void	vector_init(t_vector *v)
 	v->args[0] = NULL;
 }
 
-static char	**ft_realloc(t_vector *v, int size)
+void	vector_resize(t_vector *v, int size)
 {
-	char	**new;
-	char	**tmp;
 	int		i;
+	char	**tmp;
 
 	tmp = (char **)malloc(sizeof(char *) * v->used_size + 1);
 	i = -1;
 	while (++i < v->used_size)
-		tmp[i] = v->args[i];
+		tmp[i] = ft_strdup(v->args[i]);
 	tmp[i] = NULL;
-	new = (char **)malloc(sizeof(char *) * size + 1);
+	free_array_of_strings(v->args, v->size);
+	v->args = (char **)malloc(sizeof(char *) * size);
 	i = -1;
 	while (++i < v->used_size)
-		new[i] = v->args[i];
-	while (i < size - 1)
+		v->args[i] = ft_strdup(tmp[i]);
+	while (i < size)
 	{
-		new[i] = NULL;
+		v->args[i] = NULL;
 		i++;
 	}
-	return (new);
-}
-
-void	vector_resize(t_vector *v, int size)
-{
-	char	**items;
-
-	items = ft_realloc(v, size);
-	if (items)
-	{
-		v->args = items;
-		v->size = size;
-	}
+	v->size = size;
+	free_array(tmp);
 }
 
 void	vector_add(t_vector *v, char *item)
@@ -60,6 +49,7 @@ void	vector_add(t_vector *v, char *item)
 	if (v->size == v->used_size)
 		vector_resize(v, v->size * 2);
 	v->args[v->used_size++] = ft_strdup(item);
+	// printf("arg : %s\n", v->args[v->used_size - 1]);
 }
 
 void	vector_add_at_index(t_vector *v, char *item)
@@ -82,7 +72,6 @@ void	vector_delete(t_vector *v, int index)
 	{
         v->args[i] = ft_strdup(v->args[i + 1]);
 		free(v->args[i + 1]);
-        v->args[i + 1] = NULL;
 		i++;
     }
     v->used_size--;

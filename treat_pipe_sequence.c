@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 15:44:23 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/10/30 17:50:23 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 12:47:18 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static void	save_redir(t_token **it_list, t_token *token, t_redir **redir)
 {
 	token->type = (*it_list)->type;
 	*it_list = (*it_list)->next;
-	token->token = (*it_list)->token;
+	token->token = ft_strdup((*it_list)->token);
 	lst_add_back_redir(redir, token->type, token->token);
 	free(token->token);
 	token->token = NULL;
@@ -52,8 +52,8 @@ static void	save_pipe_sequence(t_cmd_line **cmd_line, t_vector *v,
 	lst_add_back_cmd(cmd_line, *v, *redir);
 	token->type = e_word;
 	free(token->token);
-	token->token = ft_strdup("");
-	free_array_of_strings(v->args, v->size);
+	token->token = NULL;
+	free_array_of_strings(v->args, v->used_size);
 	vector_init(v);
 	ft_free_redir_list(*redir);
 	*redir = NULL;
@@ -72,12 +72,12 @@ t_cmd_line	*treat_pipe_sequence(t_token *token_list)
 	cmd_line = NULL;
 	redir = NULL;
 	token.type = e_word;
-	token.token = ft_strdup("");
+	token.token = NULL;
 	while (it_list)
 	{
 		if (it_list->type == e_pipe || it_list->type == e_end)
 			save_pipe_sequence(&cmd_line, &v, &token, &redir);
-		else if (it_list->type != e_word)
+		else if (it_list->type != e_word && it_list->type != e_end)
 			save_redir(&it_list, &token, &redir);
 		else if (it_list->type == e_word)
 			vector_add(&v, it_list->token);

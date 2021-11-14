@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 13:13:56 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/10 16:41:53 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/14 09:08:59 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ void	ignore_dollar_var(t_vector *v)
 	}
 	else
 		v->used_size--;
+	free(res.arg);
 }
 
 void	resize_vec_when_dollar_var_empty(t_vector *v)
@@ -78,6 +79,7 @@ void	resize_vec_when_dollar_var_empty(t_vector *v)
 		v->args[v->used_size - 1] = NULL;
 		v->used_size--;
 	}
+	free(res.arg);
 }
 
 void	dollar_var_not_found(t_vector *v)
@@ -103,6 +105,7 @@ void	dollar_var_not_found(t_vector *v)
 		}
 		v->used_size--;
 	}
+	free(res.arg);
 }
 
 void	replace_dollar_var(t_vector *v, char *name, char *value)
@@ -128,4 +131,5 @@ void	replace_dollar_var(t_vector *v, char *name, char *value)
 	free(v->args[v->i]);
 	v->args[v->i] = ft_strdup(new_char_vec.arg);
 	free(tmp);
+	free(new_char_vec.arg);
 }
