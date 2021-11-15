@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/25 14:48:21 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/14 11:07:45 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 11:29:11 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	free_vector(t_vector *v)
 	int	i;
 
 	i = -1;
-	while (++i < v->size)
+	while (++i < v->used_size)
 	{
 		if (v->args[i])
 			free(v->args[i]);
@@ -62,12 +62,13 @@ void	free_cmd_line_list(t_cmd_line *cmd_line)
 	{
 		tmp = cmd_line;
 		i = -1;
-		while (++i < cmd_line->args.used_size)
+		while (++i < tmp->args.used_size)
 		{
-			if (cmd_line->args.args[i])
-				free(cmd_line->args.args[i]);
+			if (tmp->args.args[i])
+				free(tmp->args.args[i]);
 		}
-		ft_free_redir_list(cmd_line->redir);
+		free(tmp->args.args);
+		ft_free_redir_list(tmp->redir);
 		cmd_line = cmd_line->next;
 		free(tmp);
 	}

@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 15:44:23 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/14 12:47:18 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 11:22:55 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static void	save_pipe_sequence(t_cmd_line **cmd_line, t_vector *v,
 	token->type = e_word;
 	free(token->token);
 	token->token = NULL;
-	free_array_of_strings(v->args, v->used_size);
+	free_vector(v);
 	vector_init(v);
 	ft_free_redir_list(*redir);
 	*redir = NULL;
@@ -83,5 +83,6 @@ t_cmd_line	*treat_pipe_sequence(t_token *token_list)
 			vector_add(&v, it_list->token);
 		it_list = it_list->next;
 	}
+	free_vector(&v);
 	return (cmd_line);
 }

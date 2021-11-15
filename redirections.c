@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:25:24 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/14 15:11:00 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 13:33:27 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,74 +27,79 @@ t_type	redirections(char *str, int i)
 	return (e_word);
 }
 
-static void	heredocs(char *file, char **str)
+static void	heredocs(char *file, int *i)
 {
 	char	*tmp;
 	char	*buff;
+	char	*str;
 
-	*str = NULL;
+	*i = 0;
+	str = NULL;
+	g_var.heredoc = 1;
 	while (1)
 	{
 		buff = readline("> ");
 		if (!buff || !ft_strcmp(file, buff))
-			break;
-		if (!*str)
-			*str = ft_strdup(buff);
+			break ;
+		if (!str)
+			str = ft_strdup(buff);
 		else
 		{
-			tmp = *str;
-			*str = ft_strjoin_new_line(*str, buff);
+			tmp = str;
+			str = ft_strjoin_new_line(str, buff);
 			free(tmp);
 		}
 		free(buff);
 	}
-	*str = ft_strjoin_new_line(*str, "");
+	str = ft_strjoin_new_line(str, "");
+	write_heredocs_reslut(str);
+	free(str);
 }
 
-void exec_redir(t_redir *redir, t_vector *path)
+static int	ft_open_files(t_redir *redir, int *i)
+{
+	int	fd;
+
+	if (redir->type == e_dgreat)
+	{
+		fd = open(redir->file, O_WRONLY | O_APPEND | O_CREAT, 0755);
+		(*i)++;
+	}
+	else if (redir->type == e_great)
+	{
+		fd = open(redir->file, O_WRONLY | O_CREAT | O_TRUNC, 0755);
+		(*i)++;
+	}
+	else if (redir->type == e_less && !redir->next)
+	{
+		fd = open(redir->file, O_RDONLY, 0755);
+		dup2(fd, 0);
+	}
+	return (fd);
+}
+
+void	exec_redir(t_redir *redir, t_vector *path)
 {
 	int		fd;
 	int		i;
-	int		p[2];
-	char	*str;
 
 	i = 0;
-	pipe(p);
 	while (redir)
 	{
-		if (redir->type == e_dgreat)
-		{
-			fd = open(redir->file, O_WRONLY | O_APPEND | O_CREAT, 0755);
-			i++;
-		}
-		else if (redir->type == e_great)
-		{
-			fd = open(redir->file, O_WRONLY | O_CREAT | O_TRUNC, 0755);
-			i++;
-		}
-		else if (redir->type == e_dless)
-		{
-			g_var.heredoc = 1;
-			heredocs(redir->file, &str);
-			write(p[1], str, ft_strlen(str));
-			dup2(p[0], g_var.original_stdin);
-			close(p[1]);
-			close(p[0]);
-			i = 0;
-		}
-		else if (redir->type == e_less && !redir->next)
-		{
-			fd = open(redir->file, O_RDONLY, 0755);
-			dup2(fd, 0);
-		}
+		if (redir->type == e_dless)
+			heredocs(redir->file, &i);
+		else
+			fd = ft_open_files(redir, &i);
 		if (redir->type != e_dless && redir->type != e_less && i != 0)
 		{
 			check_permissions(redir);
 			fd_error(fd);
 		}
 		redir = redir->next;
+		if (redir)
+			close(fd);
 	}
 	if (i != 0)
 		dup2(fd, 1);
-	// close(fd);
+	close(fd);
 }

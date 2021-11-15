@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tokenezation.c                                     :+:      :+:    :+:   */
+/*   tokenize_cmd_line.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/10/30 18:20:53 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/14 15:14:10 by mdaifi           ###   ########.fr       */
+/*   Created: 2021/11/15 11:00:50 by mdaifi            #+#    #+#             */
+/*   Updated: 2021/11/15 11:08:42 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static int	count_nbr_of_chars(char *str, int *i)
 	return (count);
 }
 
-char	*get_token(char *str, int *i, t_type *type)
+static char	*get_token(char *str, int *i, t_type *type)
 {
 	int		j;
 	char	*res;
@@ -64,6 +64,17 @@ char	*get_token(char *str, int *i, t_type *type)
 	return (res);
 }
 
+static int	unclosed_quotes(t_token *token_list, char **token)
+{
+	if (!check_nbr_of_quotes(*token))
+	{
+		free(*token);
+		free_token_list(token_list);
+		return (1);
+	}
+	return (0);
+}
+
 t_token	*tokenize_command_line(char *str)
 {
 	t_type	type;
@@ -81,92 +92,12 @@ t_token	*tokenize_command_line(char *str)
 		else
 		{
 			token = get_token(str, &i, &type);
-			if (!check_nbr_of_quotes(token))
-			{
-				free(token);
-				free_token_list(token_list);
+			if (unclosed_quotes(token_list, &token))
 				return (NULL);
-			}
 			lst_add_back_token(&token_list, type, token);
 			free(token);
 		}
 	}
 	lst_add_back_token(&token_list, e_end, "newline");
 	return (token_list);
-}
-
-void	print_cmd_lines(t_cmd_line *cmd_line)
-{
-	int			i;
-	t_cmd_line	*tmp;
-	t_redir		*tmp_redir;
-
-	tmp = cmd_line;
-		debug
-	while (tmp)
-	{
-		i = -1;
-		while (++i < tmp->args.used_size)
-			printf("---- |%s|\n", tmp->args.args[i]);
-		tmp_redir = tmp->redir;
-		while (tmp_redir)
-		{
-			printf("+++ %s\n", tmp_redir->file);
-			printf("+++ %d\n", tmp_redir->type);
-			tmp_redir = tmp_redir->next;
-		}
-		printf("~~~~~~~~~~~~~~~~~~~~~~\n");
-		tmp = tmp->next;
-	}
-}
-
-void	init_global_struct(void)
-{
-	g_var.pid = 0;
-	g_var.original_stdin = 0;
-	g_var.stat = 0;
-	g_var.heredoc = 0;
-}
-
-int	main(int argc, char *argv[], char *env[])
-{
-	t_cmd_line	*cmd_line;
-	t_token		*token_list;
-	t_vector	*path;
-	char		*str;
-	int			true;
-
-	true = 1;
-	cmd_line = NULL;
-	path = env_copy(env);
-	init_global_struct();
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGINT, parent_sig);
-	while (true)
-	{
-		str = readline("minishell > ");
-		if (!str)
-			exit(1);
-		else if (ft_strlen(str))
-		{
-			add_history(str);
-			token_list = tokenize_command_line(str);
-			if (token_list && !check_token_syntax(token_list))
-				free_token_list(token_list);
-			else if (token_list)
-			{
-				cmd_line = treat_pipe_sequence(token_list);
-				free_token_list(token_list);
-				if (cmd_line)
-				{
-					look_for_expandable_vars(cmd_line, path);
-					// print_cmd_lines(cmd_line);
-					check_cmd(cmd_line, path);
-					free_cmd_line_list(cmd_line);
-				}
-			}
-			free(str);
-		}
-	}
-	return (0);
 }

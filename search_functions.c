@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/10 14:45:15 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/13 15:27:26 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 10:50:03 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ char	*search_path_of_cmd(char *str, char *env)
 	return (NULL);
 }
 
-void path_not_found(char *path)
+void	path_not_found(char *path)
 {
 	if (!path)
 	{

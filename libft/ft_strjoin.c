@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/22 20:44:44 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/06 11:20:22 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 10:29:36 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ char	*ft_strjoin_new_line(char const *s1, char const *s2)
 			tmp[i] = s1[i];
 			i++;
 		}
-        tmp[i++] = '\n';
+		tmp[i++] = '\n';
 		while (s2[j])
 			tmp[i++] = s2[j++];
 		tmp[i] = '\0';

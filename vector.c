@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/26 16:18:01 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/14 16:00:38 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 10:30:44 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,9 @@ void	vector_resize(t_vector *v, int size)
 
 void	vector_add(t_vector *v, char *item)
 {
-	if (v->size == v->used_size)
+	if (v->size - 1 == v->used_size)
 		vector_resize(v, v->size * 2);
 	v->args[v->used_size++] = ft_strdup(item);
-	// printf("arg : %s\n", v->args[v->used_size - 1]);
 }
 
 void	vector_add_at_index(t_vector *v, char *item)
@@ -64,17 +63,17 @@ void	vector_delete(t_vector *v, int index)
 {
 	int	i;
 
-    if (index < 0 || index >= v->used_size)
-        return;
+	if (index < 0 || index >= v->used_size)
+		return ;
 	free(v->args[index]);
 	i = index;
-    while (i < v->used_size - 1)
+	while (i < v->used_size - 1)
 	{
-        v->args[i] = ft_strdup(v->args[i + 1]);
+		v->args[i] = ft_strdup(v->args[i + 1]);
 		free(v->args[i + 1]);
 		i++;
-    }
-    v->used_size--;
-    if (v->used_size > 0 && v->used_size == v->size / 4)
-        vector_resize(v, v->size / 2);
+	}
+	v->used_size--;
+	if (v->used_size > 0 && v->used_size == v->size / 4)
+		vector_resize(v, v->size / 2);
 }

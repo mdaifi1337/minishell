@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:33:17 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/14 11:43:42 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 11:25:06 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,13 @@ t_vector	copy_vector(t_vector v)
 	t_vector	res;
 	int			i;
 
-	res.args = (char **)malloc(sizeof(char *) * v.size);
+	res.args = (char **)malloc(sizeof(char *) * v.used_size + 1);
 	if (!res.args)
-		exit (1); //allocation error
+		exit(1);
 	i = -1;
 	while (++i < v.used_size)
 		res.args[i] = ft_strdup(v.args[i]);
+	res.args[i] = NULL;
 	res.used_size = v.used_size;
 	res.size = v.size;
 	return (res);

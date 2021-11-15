@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/06 10:43:18 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/11 15:15:01 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 10:38:10 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void	child_sig(int sig)
 	exit(g_var.stat);
 }
 
-void parent_sig(int sig)
+void	parent_sig(int sig)
 {
 	if (g_var.heredoc == 1)
 		g_var.stat = 1;

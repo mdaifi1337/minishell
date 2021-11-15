@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/07 14:38:19 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/14 15:45:39 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 13:44:49 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,13 @@
 
 void	execute_cmd(char **env, t_cmd_line *cmd)
 {
-	char	**args;
-
-	args = copy_array(cmd->args.args, cmd->args.used_size);
-	if (execve(args[0], args, env) < 0)
+	if (execve(cmd->args.args[0], cmd->args.args, env) < 0)
 	{
 		write(1, "minishell: ", 12);
-		ft_putstr_fd(args[0], 1);
+		ft_putstr_fd(cmd->args.args[0], 1);
 		write(1, ": ", 3);
 		perror("");
-		free_array_of_strings(args, cmd->args.used_size);
+		free_array_of_strings(cmd->args.args, cmd->args.used_size);
 		waitpid(g_var.pid, &g_var.stat, 0);
 		if (WIFEXITED(g_var.stat))
 			g_var.stat = WEXITSTATUS(g_var.stat);
@@ -44,21 +41,14 @@ static void	exe_first_cmd(t_cmd_line *cmd, t_vector *path)
 		i = 0;
 		cmd_path = search_for_path_in_env(path->args);
 		path_not_found(cmd_path);
-		while (cmd->args.args[0][i])
-		{
-			if (cmd->args.args[0][i] == '/')
-			{
-				i = -1;
-				break ;
-			}
-			i++;
-		}
+		look_for_backslash(cmd->args.args[0], &i);
 		if (i != -1)
 			cmd->args.args[0] = search_path_of_cmd(cmd->args.args[0], cmd_path);
 		if (cmd->args.args[0][0] == '/')
 			execute_cmd(path->args, cmd);
 		else
-			printf("minishell: %s: No such file or directory\n", cmd->args.args[0]);
+			printf("minishell: %s: No such file or directory\n", \
+				cmd->args.args[0]);
 	}
 }
 
@@ -106,12 +96,11 @@ static void	last_node_exit_status(int ret, int *p)
 
 void	execute_second_cmd(t_cmd_line *cmd_line, t_vector *path)
 {
-	int p[2];
-	int ret;
-	pid_t pid;
+	int		p[2];
+	int		ret;
+	pid_t	pid;
 
-
-	pipe(p);
+	fd_error(pipe(p));
 	g_var.pid = fork();
 	if (g_var.pid == 0)
 		ft_child_process(cmd_line, path, p);
