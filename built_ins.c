@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/10 14:29:21 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/15 13:27:25 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/16 09:27:51 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,25 @@ void	cmd_unset(t_cmd_line *cmd, t_vector *path)
 	if (cmd->args.used_size > 1)
 		vector_delete(path, i);
 	g_var.stat = 0;
+}
+
+void	cmd_cd(t_cmd_line *cmd_line, t_vector *path)
+{
+	if (cmd_line->args.used_size != 1 && cmd_line->args.args[1] != NULL)
+	{
+		if (!chdir(cmd_line->args.args[1]))
+		{
+			g_var.stat = 0;
+			return ;
+		}
+		else
+		{
+			printf("minishell: %s: %s: No such file or directory\n", \
+				cmd_line->args.args[0], cmd_line->args.args[1]);
+			g_var.stat = 1;
+			return ;
+		}
+	}
+	else
+		cd_home(path);
 }

@@ -6,7 +6,7 @@ SRCS= main.c check_token_syntax.c tools.c treat_pipe_sequence.c \
 	 split_dollar_var.c redirections.c export.c built_ins.c \
 	 file_errors_handling.c exec_cmds.c built_ins_2.c check_cmds.c \
 	 search_functions.c signals.c tools2.c split_dollar_var_2.c \
-	 tokenize_cmd_line.c
+	 tokenize_cmd_line.c exec_cmds_2.c
 OBJS= $(SRCS:.c=.o)
 LIBFT= libft/libft.a
 

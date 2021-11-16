@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:25:24 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/15 13:33:27 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/16 09:03:33 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,9 @@ static void	heredocs(char *file, int *i)
 	char	*buff;
 	char	*str;
 
+	signal(SIGQUIT, SIG_IGN);
 	*i = 0;
 	str = NULL;
-	g_var.heredoc = 1;
 	while (1)
 	{
 		buff = readline("> ");
@@ -52,7 +52,7 @@ static void	heredocs(char *file, int *i)
 		free(buff);
 	}
 	str = ft_strjoin_new_line(str, "");
-	write_heredocs_reslut(str);
+	write_heredocs_in_stdin(str);
 	free(str);
 }
 
@@ -87,7 +87,10 @@ void	exec_redir(t_redir *redir, t_vector *path)
 	while (redir)
 	{
 		if (redir->type == e_dless)
+		{
+			g_var.heredoc = 1;
 			heredocs(redir->file, &i);
+		}
 		else
 			fd = ft_open_files(redir, &i);
 		if (redir->type != e_dless && redir->type != e_less && i != 0)

@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:20:53 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/15 11:25:29 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/15 15:36:51 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ int	main(int argc, char *argv[], char *env[])
 	signal(SIGINT, parent_sig);
 	while (true)
 	{
+		g_var.reset = 0;
 		str = readline("minishell > ");
 		if (!str)
 			exit(1);

@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/30 18:16:36 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/15 13:44:46 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/16 09:04:47 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,11 +112,12 @@ void		vector_resize(t_vector *v, int size);
 void		vector_add_at_index(t_vector *v, char *item);
 void		built_ins(t_cmd_line *cmd_line, t_vector *path);
 void		execute_cmd(char **env, t_cmd_line *cmd_line);
+void		exe_first_cmd(t_cmd_line *cmd, t_vector *path);
 void		lst_add_back_redir(t_redir **redir, t_type type, char *file);
 void		lst_add_back_token(t_token **token_list, t_type type, char *str);
 void		lst_add_back_cmd(t_cmd_line **cmd_line, t_vector v, t_redir *redir);
-void		dollar_var_has_multiple_values(t_vector *v, t_char_vec *new,
-				char **tab, int curr_pos);
+void		dollar_var_has_multiple_values(t_vector *v,
+				t_char_vec *new_char_vec, char **tab, int curr_pos);
 void		execute_second_cmd(t_cmd_line *cmd_line, t_vector *path);
 void		ignore_dollar_var(t_vector *v);
 void		cmd_unset(t_cmd_line *cmd, t_vector *path);
@@ -126,7 +127,7 @@ void		cmd_pwd(t_cmd_line *cmd_line);
 void		cmd_exit(t_cmd_line *cmd_line);
 void		cmd_export(t_cmd_line *cmd, t_vector *path);
 void		cmd_cd(t_cmd_line *cmd_line, t_vector *path);
-void		write_heredocs_reslut(char *str);
+void		write_heredocs_in_stdin(char *str);
 void		replace_path(t_vector *path, t_vector *env, int i);
 void		dollar_var_not_found(t_vector *v);
 void		look_for_expandable_vars(t_cmd_line *cmd_line, t_vector *env);

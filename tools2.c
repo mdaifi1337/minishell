@@ -6,7 +6,7 @@
 /*   By: mdaifi <mdaifi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/10 16:33:30 by mdaifi            #+#    #+#             */
-/*   Updated: 2021/11/15 13:44:34 by mdaifi           ###   ########.fr       */
+/*   Updated: 2021/11/16 09:01:29 by mdaifi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	init_global_struct(void)
 	g_var.heredoc = 0;
 }
 
-void	write_heredocs_reslut(char *str)
+void	write_heredocs_in_stdin(char *str)
 {
 	int	p[2];
 
